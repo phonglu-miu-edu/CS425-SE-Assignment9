@@ -37,7 +37,7 @@
         <div class="col-xl-12 p-t-10">
             <h4 class="mt-4 mb-3 text-uppercase text-center">Students</h4>
         </div>
-        <div class="col-xl-3">
+        <div class="col-xl-4">
             <div class="row">
                 <div class="col-md-12">
                     <h5 id="formTitle">New Register</h5>
@@ -45,24 +45,35 @@
             </div>
             <div class="row">
                 <form id="mainForm" class="row g-3 needs-validation" novalidate>
-                    <input type="hidden" id="studentId" />
                     <div class="row">
-                        <div class="col-md-12 mb-4">
+                        <div class="col-md-6 mb-4">
                             <div class="form-outline">
                                 <label for="studentNumber" class="form-label">Student number</label>
                                 <input type="text" class="form-control" id="studentNumber" placeholder="001-01-0001" required />
                             </div>
                         </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="form-outline">
+                                <label for="studentId" class="form-label">Student Id</label>
+                                <label id="studentId"></label>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-4">
+                        <div class="col-md-4 mb-4">
                             <div class="form-outline">
                                 <label for="firstName" class="form-label">First name</label>
                                 <input type="text" class="form-control" id="firstName" placeholder="David" required />
                             </div>
                         </div>
-                        <div class="col-md-6 mb-4">
+                        <div class="col-md-4 mb-4">
+                            <div class="form-outline">
+                                <label for="middleName" class="form-label">Middle name</label>
+                                <input type="text" class="form-control" id="middleName" placeholder="Liner" />
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
                             <div class="form-outline">
                                 <label for="firstName" class="form-label">Last name</label>
                                 <input type="text" class="form-control" id="lastName" placeholder="Scott" required />
@@ -71,24 +82,13 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="form-outline">
-                                <label for="middleName" class="form-label">Middle name</label>
-                                <input type="text" class="form-control" id="middleName" placeholder="Liner" />
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
+                        <div class="col-md-3 mb-4">
                             <div class="form-outline">
                                 <label for="cgpa" class="form-label">CGPA</label>
                                 <input type="number" class="form-control" id="cgpa" step="0.1" placeholder="3.5" />
                             </div>
                         </div>
-                        <div class="col-md-6 mb-4">
+                        <div class="col-md-3 mb-4">
                             <div class="form-outline">
                                 <label for="isInternational" class="form-label">International</label>
                                 <select class="form-select" id="isInternational" required>
@@ -97,10 +97,7 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-outline">
                                 <label for="dateOfEnrollment" class="form-label">Date of Enrollment</label>
                                 <input id="dateOfEnrollment" placeholder="09/15/2023" required />
@@ -115,10 +112,22 @@
                 </form>
             </div>
         </div>
-        <div class="col-xl-9">
+        <div class="col-xl-8">
             <div class="row">
                 <div class="col-md-12">
-                    <h5>List</h5>
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5>List</h5>
+                        </div>
+                        <div class="row g-3 align-items-center">
+                            <div class="col-auto">
+                                <label for="search" class="form-label">Search</label>
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" class="form-control" id="search" placeholder="Type in anything..." />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -193,6 +202,10 @@
 
                 form.classList.add('was-validated');
             }, false);
+
+            $('#search').change(e => {
+                reloadGrid(e.target.value);
+            });
         });
 
         $('#studentNumber').mask('000-00-0000');
@@ -205,8 +218,8 @@
         reloadGrid();
     })();
 
-    function reloadGrid() {
-        $.get('/student/list').then(res => {
+    function reloadGrid(keyword) {
+        $.get(`/student/list${keyword ? `?keyword=${keyword}` : ''}`).then(res => {
             $('#tableBody').html('');
 
             if (res) {
@@ -216,7 +229,7 @@
                     const firstName = s.firstName;
                     const middleName = s.middleName;
                     const lastName = s.lastName;
-                    const cgpa = s.cgpa;
+                    const cgpa = s.cgpa ? s.cgpa : '';
                     const dateOfEnrollment = new Date(s.dateOfEnrollment).toLocaleDateString();
                     const isInternational = s.isInternational;
 
@@ -250,7 +263,7 @@
             $('#btnCancel').show();
         } else {
             document.getElementById('mainForm').reset();
-            $('#studentId').val('');
+            $('#studentId').text('');
             $('#formTitle').text('New registration');
             $('#btnRegister').text('Register');
             $('#btnCancel').hide();
@@ -266,7 +279,7 @@
                 if (res) {
                     setFormState(true);
 
-                    $('#studentId').val(res.studentId);
+                    $('#studentId').text(res.studentId);
                     $('#studentNumber').val(res.studentNumber);
                     $('#firstName').val(res.firstName);
                     $('#lastName').val(res.lastName);

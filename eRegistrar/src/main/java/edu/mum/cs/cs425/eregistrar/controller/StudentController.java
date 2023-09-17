@@ -6,8 +6,6 @@ import edu.mum.cs.cs425.eregistrar.repository.StudentRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Controller
 public class StudentController {
     private final StudentRepository studentRepository;
@@ -29,8 +27,13 @@ public class StudentController {
 
     @GetMapping("/student/list")
     @ResponseBody
-    public Iterable<Student> listStudents() {
-        return this.studentRepository.findAll();
+    public Iterable<Student> listStudents(@RequestParam(required = false) String keyword) {
+        if (keyword == null || keyword.isEmpty()) {
+            return this.studentRepository.findAll();
+        } else {
+            String searchKeyword = '%' + keyword + '%';
+            return this.studentRepository.findByStudentNumberLikeOrFirstNameLikeIgnoreCaseOrMiddleNameLikeIgnoreCaseOrLastNameLikeIgnoreCase(searchKeyword, searchKeyword, searchKeyword, searchKeyword);
+        }
     }
 
     @PostMapping(value = "/student")
