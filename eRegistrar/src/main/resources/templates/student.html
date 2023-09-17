@@ -166,7 +166,7 @@
         Array.from(forms).forEach(form => {
             form.addEventListener('submit', event => {
                 if (form.checkValidity()) {
-                    const studentId = $('#studentId').val();
+                    const studentId = $('#studentId').text();
                     const studentNumber = $('#studentNumber').val();
                     const firstName = $('#firstName').val();
                     const lastName = $('#lastName').val();
