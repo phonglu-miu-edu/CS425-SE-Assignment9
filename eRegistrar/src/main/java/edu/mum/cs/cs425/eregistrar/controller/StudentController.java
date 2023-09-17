@@ -1,5 +1,6 @@
 package edu.mum.cs.cs425.eregistrar.controller;
 
+import edu.mum.cs.cs425.eregistrar.exception.StudentExistsException;
 import edu.mum.cs.cs425.eregistrar.exception.StudentNotFoundException;
 import edu.mum.cs.cs425.eregistrar.model.Student;
 import edu.mum.cs.cs425.eregistrar.repository.StudentRepository;
@@ -39,6 +40,12 @@ public class StudentController {
     @PostMapping(value = "/student")
     @ResponseBody
     public Student createStudent(@RequestBody Student student) {
+        String studentNumber = student.getStudentNumber();
+        Student newStudent = this.studentRepository.findByStudentNumber(studentNumber);
+        if (newStudent != null) {
+            throw new StudentExistsException(studentNumber);
+        }
+
         return this.studentRepository.save(student);
     }
 
@@ -47,7 +54,13 @@ public class StudentController {
     public Student updateStudent(@PathVariable long id, @RequestBody Student newStudent) {
         return this.studentRepository.findById(id)
                 .map(student -> {
-                    student.setStudentNumber(newStudent.getStudentNumber());
+                    String studentNumber = newStudent.getStudentNumber();
+                    Student oldStudent = this.studentRepository.findByStudentNumber(studentNumber);
+                    if (oldStudent != null && oldStudent.getStudentId() != id) {
+                        throw new StudentExistsException(studentNumber);
+                    }
+
+                    student.setStudentNumber(studentNumber);
                     student.setFirstName(newStudent.getFirstName());
                     student.setLastName(newStudent.getLastName());
                     student.setMiddleName(newStudent.getMiddleName());
