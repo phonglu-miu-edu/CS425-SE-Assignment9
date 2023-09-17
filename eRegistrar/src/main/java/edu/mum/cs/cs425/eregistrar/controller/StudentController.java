@@ -62,7 +62,7 @@ public class StudentController {
 
     @DeleteMapping("/student/{id}")
     @ResponseBody
-    public boolean deleteEmployee(@PathVariable long id) {
+    public boolean deleteStudent(@PathVariable long id) {
         this.studentRepository.deleteById(id);
         return true;
     }
